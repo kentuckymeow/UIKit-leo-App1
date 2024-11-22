@@ -71,6 +71,12 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         infoButton.titleLabel?.layer.shadowRadius = 1
         
         infoButton.contentHorizontalAlignment = .leading
+        
+        infoButton.addTarget(self, action: #selector(self.infoTarget), for: .touchUpInside)
+    }
+    
+    @objc func infoTarget() {
+        print("info info info")
     }
     
     
@@ -81,7 +87,8 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         redButton.layer.cornerRadius = 10
         redButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         redButton.translatesAutoresizingMaskIntoConstraints = false
-
+        redButton.addTarget(self, action: #selector(navigateToPasswordView), for: .touchUpInside)
+        
         view.addSubview(redButton)
         
         NSLayoutConstraint.activate([
@@ -90,26 +97,31 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             redButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25),
             redButton.heightAnchor.constraint(equalToConstant: 55)
         ])
-        
+    }
+    
+    @objc func navigateToPasswordView() {
+        let passwordView = PasswordViewController()
+        print("Go")
+        passwordView.modalPresentationStyle = .fullScreen
+        passwordView.modalTransitionStyle = .coverVertical
+        present(passwordView,animated: true,completion: nil)
     }
 
     
     private func setUpStackView() {
-        let stackView = UIStackView(arrangedSubviews: [mainLabel,descLabel,tableView,infoButton])
-        stackView.axis = .vertical
-        stackView.spacing = 15
-       
+        let mainStackView = UIStackView(arrangedSubviews: [mainLabel,descLabel,tableView,infoButton])
+        mainStackView.axis = .vertical
+        mainStackView.spacing = 15
+        mainStackView.translatesAutoresizingMaskIntoConstraints = false
         
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(stackView)
+        view.addSubview(mainStackView)
         
         NSLayoutConstraint.activate([
-            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 15),
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
-            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15),
-            stackView.bottomAnchor.constraint(equalTo: redButton.topAnchor,constant: -50)
+            mainStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            mainStackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 15),
+            mainStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
+            mainStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15),
+            mainStackView.bottomAnchor.constraint(equalTo: redButton.topAnchor,constant: -50)
         ])
     }
     
