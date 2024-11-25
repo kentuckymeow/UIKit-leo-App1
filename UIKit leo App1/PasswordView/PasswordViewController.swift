@@ -13,7 +13,12 @@ class PasswordViewController: UIViewController {
     let rememberButton = UIButton()
     let circlesView = CirclesView()
     let numbersCollectionView = NumbersCollectionView()
-  
+    let closeButton = UIButton()
+    
+    private var enteredPassword: [String] = []
+    private var initialPassword: [String] = []
+    private var isRepeatMode = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -22,10 +27,11 @@ class PasswordViewController: UIViewController {
         connectCirclesView()
         setUpRememberButton()
         setUpNumbersCollectionView()
+        setUpCloseButton()
     }
     
     private func titlePasswordView() {
-        titlePasswordLabel.text = "Код быстрого Доступа"
+        titlePasswordLabel.text = "Код быстрого доступа"
         titlePasswordLabel.textColor = .black
         titlePasswordLabel.font = UIFont.systemFont(ofSize: 25, weight: .bold)
         titlePasswordLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -78,6 +84,7 @@ class PasswordViewController: UIViewController {
     }
     
     private func setUpNumbersCollectionView() {
+        numbersCollectionView.delegate = self
         numbersCollectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(numbersCollectionView)
         
@@ -89,7 +96,71 @@ class PasswordViewController: UIViewController {
         ])
     }
     
+    private func setUpCloseButton() {
+        let largeConfig = UIImage.SymbolConfiguration(pointSize: 15, weight: .light, scale: .large)
+        closeButton.setImage(UIImage(systemName: "xmark", withConfiguration: largeConfig), for: .normal)
+        closeButton.tintColor = .black
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
+        closeButton.addTarget(self, action: #selector(closeAction), for: .touchUpInside)
+        
+        
+        view.addSubview(closeButton)
+        NSLayoutConstraint.activate([
+            closeButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
+            closeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+        ])
+    }
+
+    
+    @objc func closeAction() {
+        dismiss(animated: true,completion: nil)
+    }
+    
     @objc func rememberAction() {
-        print("i dont remeber")
+        print("i don't remember")
+    }
+    
+    private func switchToRepeatMode() {
+        isRepeatMode = true
+        subPasswordLabel.text = "Повторите придуманный код"
+        rememberButton.isHidden = true
+        enteredPassword.removeAll()
+        circlesView.updateCircles(with: enteredPassword)
+        circlesView.updateBigCircles(with: enteredPassword)
+    }
+    
+    private func handlePasswordCompletion() {
+        if isRepeatMode {
+            if enteredPassword == initialPassword {
+                print("Пароль успешно подтверждён!")
+            } else {
+                print("Пароли не совпадают!")
+            }
+        } else {
+            initialPassword = enteredPassword
+            switchToRepeatMode()
+        }
+    }
+}
+
+extension PasswordViewController: NumbersCollectionViewDelegate {
+    func didTapNumber(_ number: String) {
+        if enteredPassword.count < 4 {
+            enteredPassword.append(number)
+            circlesView.updateCircles(with: enteredPassword)
+            circlesView.updateBigCircles(with: enteredPassword)
+            
+            if enteredPassword.count == 4 {
+                handlePasswordCompletion()
+            }
+        }
+    }
+    
+    func didTapDelete() {
+        if !enteredPassword.isEmpty {
+            enteredPassword.removeLast()
+            circlesView.updateCircles(with: enteredPassword)
+            circlesView.updateBigCircles(with: enteredPassword)
+        }
     }
 }

@@ -7,9 +7,14 @@
 
 import UIKit
 
-import UIKit
+protocol NumbersCollectionViewDelegate: AnyObject {
+    func didTapNumber(_ number: String)
+    func didTapDelete()
+}
 
 class NumbersCollectionView: UIView, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
+    weak var delegate: NumbersCollectionViewDelegate?
     
     private let collectionView: UICollectionView
     private let numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "⌫"]
@@ -78,6 +83,12 @@ class NumbersCollectionView: UIView, UICollectionViewDelegate, UICollectionViewD
             return
         }
         
+        if selectedItem == "⌫" {
+            delegate?.didTapDelete()
+        } else {
+            delegate?.didTapNumber(selectedItem)
+        }
+        
         if let previousIndexPath = selectedIndexPath,
            let previousCell = collectionView.cellForItem(at: previousIndexPath) as? NumberCell {
             previousCell.resetColor()
@@ -88,13 +99,8 @@ class NumbersCollectionView: UIView, UICollectionViewDelegate, UICollectionViewD
         }
         
         selectedIndexPath = indexPath
-        
-        if selectedItem == "⌫" {
-            print("Удалить символ")
-        } else if let number = Int(selectedItem) {
-            print("Выбрано число: \(number)")
-        }
     }
+
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let spacing: CGFloat = 20
@@ -145,6 +151,6 @@ class NumberCell: UICollectionViewCell {
     
     func resetColor() {
         contentView.backgroundColor = .white
-        isHighlightedState = false 
+        isHighlightedState = false
     }
 }
